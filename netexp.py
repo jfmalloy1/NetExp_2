@@ -59,14 +59,16 @@ def turn_on_reactions(cum_cpds, cum_rxns, products, substrates):
 
     #Add new compounds from product -> substrate
     for rxn in products.keys():
-        cpds = products[rxn]
-        if set(cpds).issubset(cum_cpds):
+        cpds = products[rxn]["cpds"]
+        dir = products[rxn]["dir"]
+        if (dir == "RIGHT-TO-LEFT" or dir == "PHYSIOL-RIGHT-TO-LEFT" or dir == "REVERSIBLE" or dir=="") and set(cpds).issubset(cum_cpds):
             new_rxns.append(rxn)
 
     #Add new compounds from substrate -> product
     for rxn in substrates.keys():
-        cpds = substrates[rxn]
-        if set(cpds).issubset(cum_cpds):
+        cpds = substrates[rxn]["cpds"]
+        dir = substrates[rxn]["dir"]
+        if (dir == "LEFT-TO-RIGHT" or dir == "PHYSIOL-LEFT-TO-RIGHT" or dir == "REVERSIBLE" or dir=="") and set(cpds).issubset(cum_cpds):
             new_rxns.append(rxn)
 
     return list(set(new_rxns) - set(cum_rxns))
@@ -90,8 +92,8 @@ def add_cpds(rxns, cum_cpds, substrates, products):
     """
     new_cpds = []
     for rxn in rxns:
-        new_cpds.extend(products[rxn])
-        new_cpds.extend(substrates[rxn])
+        new_cpds.extend(products[rxn]["cpds"]) #Note: added extra [cpds] for metacyc analysis
+        new_cpds.extend(substrates[rxn]["cpds"])
 
     #Return new compounds, excluding those already in the cumulative set
     return list(set(new_cpds) - set(cum_cpds))
@@ -117,7 +119,7 @@ def run_network_expansion(seeds, products, substrates, count):
         "n_reactions_cumulative", "n_reactions_new"
     ])
 
-    for i in range(10):
+    while flag:
         #Step 1: add newly found cps associated with reactions to cumulative cpds
         new_cpds = add_cpds(new_rxns, cum_cpds, products, substrates)
         cum_cpds.extend(new_cpds)
@@ -157,15 +159,19 @@ def run_network_expansion(seeds, products, substrates, count):
     print("Cumulative reaction size", len(cum_rxns))
     print("Generations:", count)
 
+    #Test output
+    print(cum_rxns)
+    print(cum_cpds)
+
     pickle.dump(output_df,
                 file=open("Data/Output/output_" + str(count) + ".p", "wb"))
 
 
 def main():
-    fp = "Data/reaction_edges.json"
+    fp = "Data/metacyc_reactions_edges.json"
     products, substrates = load_reaction_data(fp)
 
-    seed_list = load_seeds("Seeds/primordial.txt")
+    seed_list = load_seeds("Seeds/metacyc_test.txt")
 
     #Run network expansion over each seed set
     count = 0
