@@ -164,14 +164,14 @@ def run_network_expansion(seeds, products, substrates, count):
     print(cum_cpds)
 
     pickle.dump(output_df,
-                file=open("Data/Output/output_" + str(count) + ".p", "wb"))
+                file=open("Data/Output/CSE_0.p", "wb"))
 
 
 def main():
     fp = "Data/metacyc_reactions_edges.json"
     products, substrates = load_reaction_data(fp)
 
-    seed_list = load_seeds("Seeds/metacyc_test.txt")
+    seed_list = load_seeds("Seeds/CSE_0.txt")
 
     #Run network expansion over each seed set
     count = 0
