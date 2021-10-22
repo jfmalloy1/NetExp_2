@@ -164,7 +164,7 @@ def run_network_expansion(seeds, products, substrates, count):
     print(cum_cpds)
 
     pickle.dump(output_df,
-                file=open("Data/Output/CSE_0.p", "wb"))
+                file=open("Data/Output/CSE_" + str(count) + ".p", "wb"))
 
 
 def main():

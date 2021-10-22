@@ -3,7 +3,6 @@ import json
 import assemblycalculator as ac
 import time
 import multiprocessing as mp
-import os
 
 
 def find_expansion_cpds(fp):
@@ -78,7 +77,7 @@ def calculate_assembly(cpd, inchi):
     Returns:
         set: (compound, assembly index)
     """
-    return (cpd, ac.calculate_ma(inchi, 60, "exact"))
+    return (cpd, ac.calculate_ma(inchi, 500, "exact"))
 
 
 def find_assembly_values(cpd_inchi_dict):
@@ -128,7 +127,7 @@ def main():
     cpd_assembly_dict = find_assembly_values(cpd_inchi_dict)
 
     #Write final assembly numbers to a json file
-    with open("Data/assembly_values_parallel.json", "w") as f:
+    with open("Data/assembly_values_parallel_largeTimeout.json", "w") as f:
         json.dump(cpd_assembly_dict, f, indent=2)
 
     print("Time:", time.time() - start)
