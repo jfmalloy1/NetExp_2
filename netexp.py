@@ -61,14 +61,16 @@ def turn_on_reactions(cum_cpds, cum_rxns, products, substrates):
     for rxn in products.keys():
         cpds = products[rxn]["cpds"]
         dir = products[rxn]["dir"]
-        if (dir == "RIGHT-TO-LEFT" or dir == "PHYSIOL-RIGHT-TO-LEFT" or dir == "REVERSIBLE" or dir=="") and set(cpds).issubset(cum_cpds):
+        if (dir == "RIGHT-TO-LEFT" or dir == "PHYSIOL-RIGHT-TO-LEFT" or dir
+                == "REVERSIBLE" or dir == "") and set(cpds).issubset(cum_cpds):
             new_rxns.append(rxn)
 
     #Add new compounds from substrate -> product
     for rxn in substrates.keys():
         cpds = substrates[rxn]["cpds"]
         dir = substrates[rxn]["dir"]
-        if (dir == "LEFT-TO-RIGHT" or dir == "PHYSIOL-LEFT-TO-RIGHT" or dir == "REVERSIBLE" or dir=="") and set(cpds).issubset(cum_cpds):
+        if (dir == "LEFT-TO-RIGHT" or dir == "PHYSIOL-LEFT-TO-RIGHT" or dir
+                == "REVERSIBLE" or dir == "") and set(cpds).issubset(cum_cpds):
             new_rxns.append(rxn)
 
     return list(set(new_rxns) - set(cum_rxns))
@@ -92,7 +94,9 @@ def add_cpds(rxns, cum_cpds, substrates, products):
     """
     new_cpds = []
     for rxn in rxns:
-        new_cpds.extend(products[rxn]["cpds"]) #Note: added extra [cpds] for metacyc analysis
+        new_cpds.extend(
+            products[rxn]
+            ["cpds"])  #Note: added extra [cpds] for metacyc analysis
         new_cpds.extend(substrates[rxn]["cpds"])
 
     #Return new compounds, excluding those already in the cumulative set
@@ -107,6 +111,7 @@ def run_network_expansion(seeds, products, substrates, count):
         seeds (list): compound IDs of starting expansion seeds
         products (dict): dictionary of rxn:[] for all products in a dataset
         substrates (dict): dictionary of rxn:[] for all substrates in a dataset
+        count (int): run number - for example, if there are 5 seed sets, the count would range from 0-4
     """
     cum_rxns = []
     new_rxns = []
@@ -153,14 +158,13 @@ def run_network_expansion(seeds, products, substrates, count):
         output_df = output_df.append(s, ignore_index=True)
 
     #Print final stats # TODO: make this a specific function?
-    print("----- Run", count,"-----")
+    print("----- Run", count, "-----")
     print("New cpd size:", len(new_cpds))
     print("Cumulative cpd size:", len(cum_cpds))
     print("New reaction size:", len(new_rxns))
     print("Cumulative reaction size", len(cum_rxns))
     print("Generations:", generation)
     print()
-
 
     pickle.dump(output_df,
                 file=open("Data/Output/CSE_" + str(count) + ".p", "wb"))
