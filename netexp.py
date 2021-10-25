@@ -112,7 +112,7 @@ def run_network_expansion(seeds, products, substrates, count):
     new_rxns = []
     cum_cpds = seeds
     flag = 1
-    count = 0
+    generation = 0
     output_df = pd.DataFrame(columns=[
         "compounds_cumulative", "compounds_new", "reactions_cumulative",
         "reactions_new", "n_compounds_cumulative", "n_compounds_new",
@@ -133,7 +133,7 @@ def run_network_expansion(seeds, products, substrates, count):
 
         #Step 3: add reactions to cumulative rxns
         cum_rxns.extend(new_rxns)
-        count += 1
+        generation += 1
 
         #Create pandas series from data
         s = pd.Series([
@@ -153,15 +153,14 @@ def run_network_expansion(seeds, products, substrates, count):
         output_df = output_df.append(s, ignore_index=True)
 
     #Print final stats # TODO: make this a specific function?
+    print("----- Run", count,"-----")
     print("New cpd size:", len(new_cpds))
     print("Cumulative cpd size:", len(cum_cpds))
     print("New reaction size:", len(new_rxns))
     print("Cumulative reaction size", len(cum_rxns))
-    print("Generations:", count)
+    print("Generations:", generation)
+    print()
 
-    #Test output
-    print(cum_rxns)
-    print(cum_cpds)
 
     pickle.dump(output_df,
                 file=open("Data/Output/CSE_" + str(count) + ".p", "wb"))
@@ -171,7 +170,7 @@ def main():
     fp = "Data/metacyc_reactions_edges.json"
     products, substrates = load_reaction_data(fp)
 
-    seed_list = load_seeds("Seeds/CSE_0.txt")
+    seed_list = load_seeds("Seeds/CSE_seeds.txt")
 
     #Run network expansion over each seed set
     count = 0
