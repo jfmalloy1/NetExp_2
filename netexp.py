@@ -40,11 +40,13 @@ def load_seeds(fp):
     return seed_list
 
 
-def turn_on_reactions(cum_cpds, cum_rxns, products, substrates):
+def turn_on_metacyc_reactions(cum_cpds, cum_rxns, products, substrates):
     """ Finds all reactions which should be turned on.
 
     Given a list of compounds, finds all reactions which have a full set of
     products or substrates present in the cumulative compound set.
+
+    Specifically set up for MetaCyc.
 
     Args:
         cum_cpds (list): list of all compounds found
@@ -76,6 +78,39 @@ def turn_on_reactions(cum_cpds, cum_rxns, products, substrates):
     return list(set(new_rxns) - set(cum_rxns))
 
 
+def turn_on_reactions(cum_cpds, cum_rxns, products, substrates):
+    """ Finds all reactions which should be turned on.
+
+    Given a list of compounds, finds all reactions which have a full set of
+    products or substrates present in the cumulative compound set.
+
+    Specifically set up for Reayxs & KEGG jsons.
+
+    Args:
+        cum_cpds (list): list of all compounds found
+        cum_rxns (list): list of all reactions found
+        products (dict): dictionary of rxn:[] for all products in a dataset
+        substrates (dict): dictionary of rxn:[] for all substrates in a dataset
+
+    Returns:
+        list: list of new compounds found
+    """
+    new_rxns = []
+
+    #Add new compounds from product -> substrate
+    for rxn in products.keys():
+        cpds = products[rxn]
+        if set(cpds).issubset(cum_cpds):
+            new_rxns.append(rxn)
+
+    #Add new compounds from substrate -> product
+    for rxn in substrates.keys():
+        cpds = substrates[rxn]
+        if set(cpds).issubset(cum_cpds):
+            new_rxns.append(rxn)
+
+    return list(set(new_rxns) - set(cum_rxns))
+
 def add_cpds(rxns, cum_cpds, substrates, products):
     """ Add all compounds associated with a given set of reactions to the
     cumulative cpd list
@@ -95,9 +130,8 @@ def add_cpds(rxns, cum_cpds, substrates, products):
     new_cpds = []
     for rxn in rxns:
         new_cpds.extend(
-            products[rxn]
-            ["cpds"])  #Note: added extra [cpds] for metacyc analysis
-        new_cpds.extend(substrates[rxn]["cpds"])
+            products[rxn])  #Note: added extra [cpds] for metacyc analysis
+        new_cpds.extend(substrates[rxn])
 
     #Return new compounds, excluding those already in the cumulative set
     return list(set(new_cpds) - set(cum_cpds))
@@ -167,14 +201,14 @@ def run_network_expansion(seeds, products, substrates, count):
     print()
 
     pickle.dump(output_df,
-                file=open("Data/Output/CSE_" + str(count) + ".p", "wb"))
+                file=open("output/expansion_" + str(count) + ".p", "wb"))
 
 
 def main():
-    fp = "Data/metacyc_reactions_edges.json"
+    fp = "links/reaxys_rxn_edges.json"
     products, substrates = load_reaction_data(fp)
 
-    seed_list = load_seeds("Seeds/CSE_seeds.txt")
+    seed_list = load_seeds("Seeds/seed_test.txt")
 
     #Run network expansion over each seed set
     count = 0

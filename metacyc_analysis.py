@@ -99,6 +99,7 @@ def find_assembly_values(cpd_inchi_dict):
     ]
 
     pool.close()
+    pool.join()
 
     # for cpd, inchi in cpd_inchi_dict.items():
     #     cpd_assembly_results.append(calculate_assembly(cpd, inchi))
@@ -112,25 +113,25 @@ def find_assembly_values(cpd_inchi_dict):
 
 
 def main():
-    start = time.time()
-
-    #Find unique compounds in expansion
-    unique_cpds = find_expansion_cpds("Data/Output/CSE_0.p")
-
     #Get dictionary of all compounds (with inchi and smiles) in metacyc
     cpd_dict = get_cpd_dict("Data/metacyc_cpds.json")
 
-    #Link unique compounds with inchis
-    cpd_inchi_dict = find_cpd_inchis(unique_cpds, cpd_dict)
+    for run_label in [0, 1]:
+        #Find unique compounds in expansion
+        unique_cpds = find_expansion_cpds("Data/Output/CSE_" + str(run_label) +
+                                          ".p")
 
-    #Calculate assembly values over all unique compounds
-    cpd_assembly_dict = find_assembly_values(cpd_inchi_dict)
+        #Link unique compounds with inchis
+        cpd_inchi_dict = find_cpd_inchis(unique_cpds, cpd_dict)
 
-    #Write final assembly numbers to a json file
-    with open("Data/assembly_values_parallel_largeTimeout.json", "w") as f:
-        json.dump(cpd_assembly_dict, f, indent=2)
+        #Calculate assembly values over all unique compounds
+        cpd_assembly_dict = find_assembly_values(cpd_inchi_dict)
 
-    print("Time:", time.time() - start)
+        #Write final assembly numbers to a json file
+        with open(
+                "Data/assembly_values_parallel_largeTimeout" + str(run_label) +
+                ".json", "w") as f:
+            json.dump(cpd_assembly_dict, f, indent=2)
 
 
 if __name__ == "__main__":
