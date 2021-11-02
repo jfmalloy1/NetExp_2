@@ -208,7 +208,7 @@ def main():
     fp = "links/reaxys_rxn_edges.json"
     products, substrates = load_reaction_data(fp)
 
-    seed_list = load_seeds("Seeds/seed_test.txt")
+    seed_list = load_seeds("seeds/seed_test.txt")
 
     #Run network expansion over each seed set
     count = 0
