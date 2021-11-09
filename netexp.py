@@ -190,6 +190,7 @@ def run_network_expansion(seeds, products, substrates, count):
                       ])
 
         output_df = output_df.append(s, ignore_index=True)
+        print(output_df) #NOTE: printing output for Reaxys XP tracking
 
     #Print final stats # TODO: make this a specific function?
     print("----- Run", count, "-----")
